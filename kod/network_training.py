@@ -7,7 +7,11 @@ import glob, re
 string = 'this is testing branch'
 def testing_functionality():
     print('this is supposed to do something')
+<<<<<<< HEAD
 #this one is another line, its in masters
+=======
+# this is line
+>>>>>>> experimental
 
 example,samplerate = sf.read('/home/dante/order/fuw/licencjat/kod/prepro/sia_chandelier.wav17.wav')
 print('here samplerate is ', samplerate)
