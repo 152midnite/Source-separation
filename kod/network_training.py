@@ -1,17 +1,10 @@
-from keras.models import Model
+ a także swoje CV w załączniku w związku z poleceniem na miejsce trenera w Państwafrom keras.models import Model
 from keras.layers import Conv1D, Input
 import numpy as np
 import soundfile as sf 
 from data_feeder import trackLoader as tl
 import glob, re
 string = 'this is testing branch'
-def testing_functionality():
-    print('this is supposed to do something')
-
-#this one is another line, its in masters
-
-# this is line
-
 
 example,samplerate = sf.read('/home/dante/order/fuw/licencjat/kod/prepro/sia_chandelier.wav17.wav')
 print('here samplerate is ', samplerate)
