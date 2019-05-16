@@ -1,38 +1,36 @@
- a także swoje CV w załączniku w związku z poleceniem na miejsce trenera w Państwafrom keras.models import Model
-from keras.layers import Conv1D, Input
-import numpy as np
-import soundfile as sf 
-from data_feeder import trackLoader as tl
-import glob, re
-string = 'this is testing branch'
+if True:
+	import numpy as np
+	from keras.models import Sequential as seq
+	from keras.layers import LSTM
+	from keras.layers import Input
+	from keras import Model
+	from keras.layers import Dense
+	from keras.layers import RepeatVector
+	from keras.layers import TimeDistributed
+	from keras.utils import plot_model
+	from data_feeder import trackLoader as tl,file_finder as ff, generate_batches as gb
 
-example,samplerate = sf.read('/home/dante/order/fuw/licencjat/kod/prepro/sia_chandelier.wav17.wav')
-print('here samplerate is ', samplerate)
-batch_size=7
-song_size = 9
+
 epochs = 10
+samplerate, signals, sample = ff('/home/dante/order/fuw/licencjat/kod/procd_data/')
+batch_size = 1
+song_size = 9*samplerate
 
-waves = glob.glob('/home/dante/order/fuw/licencjat/kod/prepro/*.wav')
-regx = '[a-z0-9_.]+.wav'
-data = []
-for i in waves:
-    data.append(re.search(regx,i).group(0))
-print(len(data))
+x_train = np.zeros(shape=(5358, 300, 54))
+y_train = np.zeros(shape=(5358, 1))
 
+input_layer = Input(shape=(batch_size,song_size))
+lstm = LSTM(10)(input_layer)
+dense1 = Dense(20, activation='relu')(lstm)
+dense2 = Dense(song_size, activation='sigmoid')(dense1)
 
+model = Model(inputs=input_layer, outputs=dense2)
+model.compile("adam", loss='binary_crossentropy')
 
-myinput = Input(shape=(batch_size, song_size*samplerate)) # shape = (BATCH_SIZE, 1D signal)
-output = Conv1D(
-    1, # output dimension is 1
-    15, # filter length is 15
-    padding="same")(myinput)
+for layer in model.layers:
+    print(layer.output_shape)
+#exit()
 
-model = Model(inputs=myinput, outputs=output)
-
-model.compile(loss='mse',
-              optimizer='rmsprop',
-              metrics=['mse'])
-
-model.fit_generator(tl(waves,batch_size,song_size,samplerate),steps_per_epoch=batch_size, epochs=epochs)
+model.fit_generator(gb(signals,1,song_size),steps_per_epoch=batch_size, epochs=epochs)
 model.save('my_model.h5')
 del model
