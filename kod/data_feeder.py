@@ -10,18 +10,18 @@ def padarray(A, size):
 
 def generate_batches(files,batch_size,song_size):
    counter = 0
+   x_train = np.zeros([batch_size,song_size])
+   y_train = np.zeros([batch_size,song_size]) 
    while True:
-     fname = files[counter]
-     print(fname)
-     counter = (counter + 1) % len(files)
-     with open(fname,'rb') as file1:
-         signal, samplerate = sf.read(file1) 
-     x_train = padarray(signal,song_size)
-     y_train = padarray(signal,song_size)
-     yield (np.array(x_train,), np.array(y_train,))
-     #y_train = y_train.flatten()
-     #for cbatch in range(0, X_train.shape[0], batch_size):
-         #yield (X_train[cbatch:(cbatch + batch_size),:,:], y_train[cbatch:(cbatch + batch_size)])
+       for batch in range(batch_size):
+           fname = files[counter]
+           print(fname)
+           counter = (counter + 1) % len(files)
+           with open(fname,'rb') as file1:
+               signal, samplerate = sf.read(file1)
+           x_train[batch,:] = padarray(signal,song_size)
+           y_train[batch,:] = padarray(signal,song_size)
+       yield [x_train,y_train]
 
 
 
