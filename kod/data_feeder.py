@@ -21,7 +21,9 @@ def generate_batches(files,batch_size,song_size):
                signal, samplerate = sf.read(file1)
            x_train[batch,:] = padarray(signal,song_size)
            y_train[batch,:] = padarray(signal,song_size)
-       yield [x_train,y_train]
+           x_train /= np.max(x_train)
+           print (np.max(x_train))
+           yield [x_train,x_train]
 
 
 
@@ -42,6 +44,8 @@ def trackLoader(files, batch_size,song_size,samplerate):
 	        while batch_start < L:
 	            limit = min(batch_end, L)
 	            print(len(signals))
+	            signals = signals/np.max(signals)
+	            print (np.max(signals))
 	            yield [signals,signals]
 	            batch_start += batch_size   
 	            batch_end += batch_size
