@@ -22,7 +22,6 @@ def generate_batches(files,batch_size,song_size):
            x_train[batch,:] = padarray(signal,song_size)
            y_train[batch,:] = padarray(signal,song_size)
            x_train /= np.max(x_train)
-           print (np.max(x_train))
            yield [x_train,x_train]
 
 
