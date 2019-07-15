@@ -4,16 +4,6 @@ import soundfile as sf
 import sys
 import glob
 import re
-import os
-from open_files import print_open_files
-
-
-# cutter2 wypadaloby poprawic, bo tnie arbitrarnie
-# np.sum(np.abs()) powinno sie zamienic na np.std()
-# ze wzgledu na niezaleznosc od dlugosci kawalkow,
-# ale wydluza sie czas jakies 3x
-# uwaga na to bo moze nic nie zapisac
-
 
 
 def slice(data,name,tresh=0.003,step=50,limit=2000):
@@ -38,7 +28,7 @@ def slice(data,name,tresh=0.003,step=50,limit=2000):
 
 
     with open(data,'rb') as file1:
-        signal, samplerate = sf.read(file1)3
+        signal, samplerate = sf.read(file1)
     avg = np.std(signal)
     tresh = avg*tresh
     num = 1
