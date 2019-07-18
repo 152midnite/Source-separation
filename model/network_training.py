@@ -23,7 +23,12 @@ decoded = Dense(song_size,kernel_initializer='uniform', activation='sigmoid')(en
 model = Model(input_img, decoded)
 model.compile(optimizer='sgd', loss='binary_crossentropy')
 
+#print(np.shape(next(gb(signals,1,song_size))))
+s = next(gb(signals,1,song_size))
+print('this is a ',type(s))
+print(np.array(s)[:,:,0:10])
 
+exit()
 model.fit_generator(gb(signals,1,song_size),steps_per_epoch=10,epochs=epochs)
 
 model.save('my_model.h5')
