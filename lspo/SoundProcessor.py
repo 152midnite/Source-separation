@@ -8,15 +8,30 @@ class sopro(object):
 	
 	def __init__(self, sounds):
 		signal0, fs0 = self.read_song(sounds[0])
-		signals = np.zeros([len(sounds),len(signal0)])
+		signal1, fs1 = self.read_song(sounds[1])
+		N0, N1 = len(signal0), len(signal1)
+		if N0>N1:
+			signals = np.zeros([len(sounds),len(signal0)])
+			signal1 = np.pad(signal1,N0-N1,'constant',constant_values=0)
+		elif N1>N0:
+			signals = np.zeros([len(sounds),len(signal1)])
+			print(np.shape(signal1))
+			print(N1-N0)
+			a = np.zeros(N1-N0)
+			signal1 = np.concatenate([signal1,a])
+		else:
+			signals = np.zeros([len(sounds),len(signal1)])
+		
 		fss = np.zeros(len(sounds))
+
 		for sound_number in range(len(sounds)):
 			signal, fss[sound_number] = self.read_song(sounds[sound_number])
 			signals[sound_number,:] = self.to_monaural(signal)
+
 		self._signals = signals
 		self._shape = np.shape(signals)
 		self._N = self._shape[-1]
-		self.fs = fss[0]
+		self.fs = fss
 		self._t = self.N/self.fs
 		self._T = np.linspace(0,self.t,self.N)
 		self._vocal = signals[0]
