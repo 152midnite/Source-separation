@@ -7,26 +7,18 @@ class sopro(object):
 	sound processing class."""
 	
 	def __init__(self, sounds):
-		signal0, fs0 = self.read_song(sounds[0])
-		signal1, fs1 = self.read_song(sounds[1])
-		N0, N1 = len(signal0), len(signal1)
-		if N0>N1:
-			signals = np.zeros([len(sounds),len(signal0)])
-			signal1 = np.pad(signal1,N0-N1,'constant',constant_values=0)
-		elif N1>N0:
-			signals = np.zeros([len(sounds),len(signal1)])
-			print(np.shape(signal1))
-			print(N1-N0)
-			a = np.zeros(N1-N0)
-			signal1 = np.concatenate([signal1,a])
-		else:
-			signals = np.zeros([len(sounds),len(signal1)])
-		
 		fss = np.zeros(len(sounds))
 
-		for sound_number in range(len(sounds)):
-			signal, fss[sound_number] = self.read_song(sounds[sound_number])
-			signals[sound_number,:] = self.to_monaural(signal)
+		sounds_dict = {}
+		N = 0
+		for sound_number,sound in enumerate(sounds):
+			print('hi ',sound,' hi ',sound_number)
+			sounds_dict[sound], fss[sound_number] = self.read_song(sounds[sound_number])
+			if N < len(sounds_dict[sound]):
+				N = len(sounds_dict[sound])
+		signals = np.zeros([len(sounds),N])
+		for sound_number, key in enumerate(sounds_dict):
+			signals[sound_number,:len(sounds_dict[key])] = self.to_monaural(sounds_dict[key])
 
 		self._signals = signals
 		self._shape = np.shape(signals)
@@ -35,7 +27,7 @@ class sopro(object):
 		self._t = self.N/self.fs
 		self._T = np.linspace(0,self.t,self.N)
 		self._vocal = signals[0]
-		self.track = signals[1]
+		self._track = signals[1]
 
 	@property
 	def signals(self):
@@ -71,9 +63,9 @@ class sopro(object):
 		return signal, fs
 
 	def in_phase(self):
-		'''Shifting a capella track to match phase 
-		of full song.'''
-		pass
+		max_power = self.max_window()
+		print (max_power)
+		
 
 	def cut_border_silence(self,window_len=1000):
 		'''If vocal starts later than the whole song 
@@ -100,11 +92,12 @@ class sopro(object):
 	def windows_power(self,window_len=0.5,noverlap=0.25):
 		'''divides vocal into windows, calculates their overall power, returns
 		that as a list, size of a step and indexes of middles of those windows.'''
-		window_len, noverlap = window_len*self.fs, noverlap*self.fs
+		window_len, noverlap = window_len*self.fs[0], noverlap*self.fs[0]
+		print(self.fs)
 		step = int(np.floor(window_len-noverlap))
-		sums = np.zeros(int(len(np.floor(self.signals[0])/(step))))
+		sums = np.zeros(int(len(np.floor(self.vocal)/(step))))
 		for i in range(len(sums)):
-			sums[i] = np.sum(np.abs(self.signals[0,i*(step):(i+1)*(step)]))
+			sums[i] = np.sum(np.abs(self.vocal[i*(step):(i+1)*(step)]))
 		return sums, step, np.arange(1,len(sums))*step
 
 	def min_window(self,window_len=0.5,noverlap=0.25):
@@ -113,6 +106,10 @@ class sopro(object):
 		noverlap = 0.25 - in seconds, how much two neighbor windows should overlap'''
 		sums, step, middles = self.windows_power(window_len=0.5,noverlap=0.25)
 		return (np.argmin(sums[1:-1])+1)*(step)
+
+	def max_window(self,window_len=0.5,noverlap=0.25):
+		sums, step, middles = self.windows_power(window_len=0.5,noverlap=0.25)
+		return (np.argmax(sums[1:-1])+1)*(step)
 
 	def cut_in_two(self):
 		pass

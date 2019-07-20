@@ -11,16 +11,10 @@ sample.cut_border_silence()
 print ('number of samples is: {}\ntime in seconds is: {}\nand shape: {}'
 	.format(sample.N, sample.t,sample.shape))
 
+sample.in_phase()
 
-
-test_vocal = sample.vocal
-test_track = sample.track
-test_signal = 0.8*np.random.normal(size=len(test_vocal))
-test_track = test_vocal+test_signal
-
-
-
-
-plt.plot(test_track)
+exit()
+plt.plot(sample.T,sample.vocal)
+plt.plot(sample.T,sample.track,alpha=0.5)
 plt.show()
 
