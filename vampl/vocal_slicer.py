@@ -7,6 +7,7 @@ import re
 
 
 def slice(data,name,tresh=0.003,step=50,limit=2000):
+
     def cutter2(data,maximum,ans,step=100,padding=2):
         sums = np.zeros(int(len(data)/step))
         if len(sums)<=2*padding:
