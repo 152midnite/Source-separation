@@ -70,16 +70,20 @@ class sopro(object):
         windows lenght. Returns index with highest cross correlation 
         coefficient. Index represents vocal shift in relation to track
         (negative values represent track starting after vocal)
-        window - 2x of a maximum shift allowed to be tested'''
+        window - 2x of a maximum shift allowed to be tested 
+        o - origin, how far start shift between track and vocal
+        '''
         print(self.fs)
         window = int(np.ceil(window * self.fs[0]))
         coeffs = np.zeros(window)
         middle = int(np.ceil(window/2))
         for shift in range(window):
-            coeffs[shift] = np.dot(self.vocal[shift+o:shift+o+window],self.track[middle+shift+o:middle+window+shift+o])
+            coeffs[shift] = np.dot(self.vocal[shift+o:shift+o+window],
+                    self.track[middle+shift+o:middle+window+shift+o])
         return coeffs
 
     def phase_shift(window):
+        pass
         
 
 
