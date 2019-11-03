@@ -13,7 +13,7 @@ class sopro(object):
         N = 0
 
         for sound_number,sound in enumerate(sounds):
-            print('hi ',sound,' hi ',sound_number)
+            print(sound)
             sounds_dict[sound], fss[sound_number] = self.read_song(sounds[sound_number])
             if N < len(sounds_dict[sound]):
                 N = len(sounds_dict[sound])
@@ -64,6 +64,11 @@ class sopro(object):
             signal, fs = sf.read(file1)
         return signal, fs
 
+    def write_song(self,name):
+        sf.write(name+'_vocal.wav',self.vocal,int(self.fs[0]))
+        sf.write(name+'_track.wav',self.track,int(self.fs[1]))
+
+
     def partial_corr(self,window=5,o=0):
         '''Calculate partial cross correlation between
         soundtrack and vocal, using only part of the signals equaling 
@@ -80,11 +85,29 @@ class sopro(object):
         for shift in range(window):
             coeffs[shift] = np.dot(self.vocal[shift+o:shift+o+window],
                     self.track[middle+o:middle+window+o])
-        return coeffs
+        middle = np.argmax(coeffs) - middle
+        return coeffs, middle
 
-    def phase_shift(window):
-        pass
-        
+    def phase_shift(self,name,window=5,o=0):
+        correlation,middle = self.partial_corr(window,o)
+        offset = np.abs(middle)
+        print(offset)
+        if middle > 0:
+            signals = np.zeros([2,self.N+offset])
+            signals[0] = np.concatenate([self.vocal,np.zeros(offset)])
+            signals[1] = np.concatenate([np.zeros(offset),self.track])
+            self.write_song(name)
+        elif middle < 0: 
+            signals = np.zeros([2,self.N+offset])
+            print('hi ',np.shape(signals))
+            signals[1,:] = np.concatenate([self.track,np.zeros(offset)])
+            signals[0,:] = np.concatenate([np.zeros(offset),self.vocal])
+            print(np.shape(self.vocal))
+            self._signals=signals
+            print(np.shape(self.vocal))
+            self.write_song(name)
+        else:
+            print('signals already in phase, doing nothing.')
 
 
     
