@@ -79,7 +79,7 @@ class sopro(object):
         middle = int(np.ceil(window/2))
         for shift in range(window):
             coeffs[shift] = np.dot(self.vocal[shift+o:shift+o+window],
-                    self.track[middle+shift+o:middle+window+shift+o])
+                    self.track[middle+o:middle+window+o])
         return coeffs
 
     def phase_shift(window):
