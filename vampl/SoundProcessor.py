@@ -78,7 +78,6 @@ class sopro(object):
         window - 2x of a maximum shift allowed to be tested 
         o - origin, how far start shift between track and vocal
         '''
-        print(self.fs)
         window = int(np.ceil(window * self.fs[0]))
         coeffs = np.zeros(window)
         middle = int(np.ceil(window/2))
@@ -88,23 +87,31 @@ class sopro(object):
         middle = np.argmax(coeffs) - middle
         return coeffs, middle
 
+    def minimal_difference(self,window=5,o=0):
+        window = int(np.ceil(window * self.fs[0]))
+        coeffs = np.zeros(window)
+        middle = int(np.ceil(window/2))
+        for shift in range(window):
+            coeffs[shift] = np.sum(np.abs(self.vocal[shift+o:shift+o+window])\
+                    -np.abs(self.track[middle+o:middle+window+o]))
+        middle = np.argmin(coeffs) - middle
+        return coeffs, middle
+
+
     def phase_shift(self,name,window=5,o=0):
         correlation,middle = self.partial_corr(window,o)
         offset = np.abs(middle)
-        print(offset)
         if middle > 0:
             signals = np.zeros([2,self.N+offset])
-            signals[0] = np.concatenate([self.vocal,np.zeros(offset)])
-            signals[1] = np.concatenate([np.zeros(offset),self.track])
+            signals[0;] = np.concatenate([self.vocal,np.zeros(offset)])
+            signals[1;] = np.concatenate([np.zeros(offset),self.track])
+            self._signals=signals
             self.write_song(name)
         elif middle < 0: 
             signals = np.zeros([2,self.N+offset])
-            print('hi ',np.shape(signals))
             signals[1,:] = np.concatenate([self.track,np.zeros(offset)])
             signals[0,:] = np.concatenate([np.zeros(offset),self.vocal])
-            print(np.shape(self.vocal))
             self._signals=signals
-            print(np.shape(self.vocal))
             self.write_song(name)
         else:
             print('signals already in phase, doing nothing.')
@@ -137,7 +144,6 @@ class sopro(object):
         '''divides vocal into windows, calculates their overall power, returns
         that as a list, size of a step and indexes of middles of those windows.'''
         window_len, noverlap = window_len*self.fs[0], noverlap*self.fs[0]
-        print(self.fs)
         step = int(np.floor(window_len-noverlap))
         sums = np.zeros(int(len(np.floor(self.vocal)/(step))))
         for i in range(len(sums)):
